@@ -15,7 +15,7 @@ from drf_yasg import openapi
 from src.social.views import exchange_token, complete_twitter_login
 from src.files.urls import files_router
 from src.users.urls import users_router
-from src.professionals.urls import professionals_router
+from src.professionals.urls import router as professionals_router
 
 schema_view = get_schema_view(
     openapi.Info(title="Pastebin API", default_version='v1'),
