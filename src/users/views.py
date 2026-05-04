@@ -17,6 +17,7 @@ class UserViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.Cre
     queryset = User.objects.all()
     serializers = {'default': UserSerializer, 'create': CreateUserSerializer}
     permissions = {'default': (IsUserOrReadOnly,), 'create': (AllowAny,)}
+    swagger_tags = ['Users']
 
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.serializers['default'])

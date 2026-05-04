@@ -52,6 +52,7 @@ INSTALLED_APPS = (
     'src.social',
     'src.files',
     'src.common',
+    'src.professionals'
     # Third party optional apps
     # app must be placed somewhere after all the apps that are going to be generating activities
     # 'actstream',                  # activity stream

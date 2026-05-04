@@ -15,6 +15,7 @@ class FilesViewset(mixins.CreateModelMixin, viewsets.GenericViewSet, mixins.List
     queryset = File.objects.all()
     serializer_class = FileSerializer
     permissions = {'default': (IsAuthenticated,)}
+    swagger_tags = ['Files']
 
     def create(self, request, *args, **kwargs):
         """
