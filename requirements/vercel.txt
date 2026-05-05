@@ -1,0 +1,58 @@
+# Django
+Django==3.2.12
+gunicorn==20.1.0
+django-dotenv==1.4.2
+
+# Database
+psycopg2-binary==2.9.3
+
+# Caching
+redis==3.5.3
+
+# REST API & Serialization
+djangorestframework==3.12.4
+djangorestframework-simplejwt==4.7.1
+Markdown==3.3.4
+drf-yasg==1.20.0
+django-filter==2.4.0
+django-cors-headers==3.7.0
+django-rest-passwordreset==1.1.0
+
+# Model and ORM Tools
+django-model-utils==4.1.1
+django_unique_upload==0.2.1
+django-summernote==0.8.11.6
+django-celery-beat==2.0.0
+django-activity-stream==0.10.0
+django-money==2.0
+
+# Background Tasks
+celery==4.4.7
+
+# Storage & Media
+django-storages==1.11.1
+boto3==1.17.84
+easy-thumbnails==2.8.5
+
+# Social Authentication
+social-auth-core==4.1.0
+social-auth-app-django==4.0.0
+
+# Admin Interface
+django-3-jet==1.0.8
+
+# Monitoring & Error Tracking
+sentry-sdk==1.1.0
+newrelic==6.4.0.157
+
+# Health Checks
+django-health-check==3.16.4
+
+# Email
+django-inlinecss==0.3.0
+
+# Auto prefetching
+django-auto-prefetching==0.1.10
+
+# Utilities
+python-decouple==3.5

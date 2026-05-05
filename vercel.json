@@ -1,0 +1,22 @@
+{
+  "buildCommand": "pip install -r requirements/prod.txt",
+  "env": {
+    "DJANGO_SETTINGS_MODULE": "src.config.production",
+    "PYTHONUNBUFFERED": "1",
+    "PYTHONPATH": "."
+  },
+  "functions": {
+    "api/**/*.py": {
+      "memory": 1024,
+      "maxDuration": 30,
+      "includeFiles": "src/**"
+    }
+  },
+  "regions": ["iad1"],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "api/index.py"
+    }
+  ]
+}
