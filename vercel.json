@@ -5,17 +5,6 @@
     "PYTHONUNBUFFERED": "1",
     "PYTHONPATH": "."
   },
-  "functions": {
-    "api/index.py": {
-      "memory": 1024,
-      "maxDuration": 30,
-      "includeFiles": "src/**"
-    },
-    "api/cron.py": {
-      "memory": 512,
-      "maxDuration": 60
-    }
-  },
   "regions": ["iad1"],
   "routes": [
     {
