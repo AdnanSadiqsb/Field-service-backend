@@ -6,11 +6,16 @@ Configure cron schedule in vercel.cron.json
 """
 
 import os
+import sys
 import json
-import django
 
-# Set up Django
+# Set Django settings module
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'src.config.production')
+
+# Add project root to path
+sys.path.insert(0, '/var/task')
+
+import django
 django.setup()
 
 from django.http import JsonResponse
@@ -19,25 +24,35 @@ from django.http import JsonResponse
 def handler(request):
     """
     Handler for Vercel Cron events.
-    Executes background tasks (e.g., Celery beat tasks).
+    Executes background tasks (e.g., Celery beat tasks or management commands).
     
-    Verify auth before executing sensitive operations.
+    Vercel sends POST requests with authorization header.
     """
     
-    # Verify this is a POST request (Vercel sends POST to cron endpoints)
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    # Verify this is POST
+    method = request.get('httpMethod', 'GET').upper()
+    if method != 'POST':
+        return {
+            'statusCode': 405,
+            'headers': {'Content-Type': 'application/json'},
+            'body': json.dumps({'error': 'Method not allowed'}),
+        }
     
-    # Verify Cron Secret (Vercel sets this as authorization header)
-    auth_header = request.META.get('HTTP_AUTHORIZATION', '')
+    # Verify Cron Secret for security
+    headers = request.get('headers', {})
+    auth_header = headers.get('authorization', '')
     expected_secret = os.getenv('CRON_SECRET', '')
     
     if not expected_secret or auth_header != f'Bearer {expected_secret}':
-        return JsonResponse({'error': 'Unauthorized'}, status=401)
+        return {
+            'statusCode': 401,
+            'headers': {'Content-Type': 'application/json'},
+            'body': json.dumps({'error': 'Unauthorized'}),
+        }
     
     try:
         # Execute your background tasks here
-        # Example implementations:
+        # Examples:
         
         # 1. Run Django management command:
         # from django.core.management import call_command
@@ -55,19 +70,28 @@ def handler(request):
         
         # For now, just return success
         # Replace above with your actual task calls
-        print("Cron job executed successfully")
+        print("✅ Cron job executed successfully")
         
-        return JsonResponse({
-            'status': 'success',
-            'message': 'Background tasks executed'
-        }, status=200)
+        return {
+            'statusCode': 200,
+            'headers': {'Content-Type': 'application/json'},
+            'body': json.dumps({
+                'status': 'success',
+                'message': 'Background tasks executed'
+            }),
+        }
         
     except Exception as e:
         import traceback
-        print(f"Cron job error: {str(e)}")
+        error_msg = str(e)
+        print(f"❌ Cron job error: {error_msg}")
         print(traceback.format_exc())
         
-        return JsonResponse({
-            'status': 'error',
-            'message': str(e)
-        }, status=500)
+        return {
+            'statusCode': 500,
+            'headers': {'Content-Type': 'application/json'},
+            'body': json.dumps({
+                'status': 'error',
+                'message': error_msg
+            }),
+        }
