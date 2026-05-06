@@ -43,7 +43,7 @@ django-3-jet==1.0.8
 
 # Monitoring & Error Tracking
 sentry-sdk==1.1.0
-newrelic==6.4.0.157
+newrelic==9.3.0
 
 # Health Checks
 django-health-check==3.16.4
