@@ -42,7 +42,7 @@ social-auth-core==4.5.3
 social-auth-app-django==5.4.0
 
 # Admin Interface
-django-jazzmin==2.6.0
+django-3-jet==1.0.8
 
 # Monitoring & Error Tracking
 sentry-sdk==1.40.0

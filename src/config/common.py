@@ -27,7 +27,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'jazzmin',
+    'jet',
     'django.contrib.admin',
     # Third party apps
     'rest_framework',  # utilities for rest apis

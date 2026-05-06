@@ -1,7 +1,6 @@
 {
-  "framework": null,
   "installCommand": "pip install --upgrade pip setuptools wheel && pip install -r requirements/vercel.txt",
-  "buildCommand": "echo 'Build complete'",
+  "buildCommand": "echo 'Skipping collectstatic - run manually with S3 credentials'",
   "env": {
     "DJANGO_SETTINGS_MODULE": "src.config.production",
     "PYTHONUNBUFFERED": "1",
