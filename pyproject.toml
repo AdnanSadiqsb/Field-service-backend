@@ -1,3 +1,9 @@
+[project]
+name = "field-service-backend"
+version = "0.1.0"
+description = "Field Service Backend"
+requires-python = ">=3.8"
+
 [tool.black]
 line-length = 130
 target-version = ['py38']
