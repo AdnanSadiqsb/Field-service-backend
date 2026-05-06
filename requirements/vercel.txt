@@ -1,3 +1,6 @@
+# Build tools (required for Python 3.12 compatibility)
+setuptools>=69.0.0
+
 # Django
 Django==3.2.25
 gunicorn==21.2.0
@@ -13,7 +16,7 @@ redis==4.6.0
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.3.1
 Markdown==3.5.2
-drf-yasg==1.21.7
+drf-yasg==1.21.8
 django-filter==23.5
 django-cors-headers==4.3.1
 django-rest-passwordreset==1.4.1
