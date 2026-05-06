@@ -1,5 +1,5 @@
 {
-  "installCommand": "pip install -r requirements.txt",
+  "installCommand": "pip install --upgrade pip setuptools wheel && pip install -r requirements/vercel.txt",
   "buildCommand": "python manage.py collectstatic --noinput",
   "env": {
     "DJANGO_SETTINGS_MODULE": "src.config.production",
