@@ -21,10 +21,15 @@ class TradeCategoryViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ProfessionalProfileViewSet(viewsets.ModelViewSet):
-    queryset = ProfessionalProfile.objects.all()  # For router basename
+    queryset = ProfessionalProfile.objects.all()
     serializer_class = ProfessionalProfileSerializer
     permission_classes = [IsAuthenticated]
     swagger_tags = ['Professional']
+
+    def get_permissions(self):
+        if self.action == 'create':
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     def get_queryset(self):
         return ProfessionalProfile.objects.filter(user=self.request.user)
@@ -34,8 +39,17 @@ class ProfessionalProfileViewSet(viewsets.ModelViewSet):
             return ProfessionalProfileCreateSerializer
         return ProfessionalProfileSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        profile = serializer.save()
+        return Response(
+            {
+                'profile': ProfessionalProfileSerializer(profile).data,
+                'tokens': profile.user.get_tokens(),
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
     @action(detail=False, methods=['get'], url_path='me')
     def me(self, request):

@@ -1,5 +1,9 @@
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
+from django.db import transaction
 from .models import TradeCategory, TradeSubCategory, ProfessionalProfile, ProfessionalCoverageArea
+
+User = get_user_model()
 
 
 class TradeSubCategorySerializer(serializers.ModelSerializer):
@@ -20,6 +24,33 @@ class ProfessionalProfileCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfessionalProfile
         fields = ['trade_category', 'business_name', 'business_type', 'number_of_employees', 'first_name', 'surname', 'business_email', 'business_phone', 'mobile_phone', 'postcode', 'address_line_1', 'address_line_2', 'town_city', 'county']
+
+    def validate_business_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError('A user with this email already exists.')
+        return value
+
+    @transaction.atomic
+    def create(self, validated_data):
+        first_name = validated_data['first_name']
+        surname = validated_data['surname']
+        email = validated_data['business_email']
+
+        username = email.split('@')[0]
+        base_username = username
+        counter = 1
+        while User.objects.filter(username=username).exists():
+            username = f'{base_username}{counter}'
+            counter += 1
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            first_name=first_name,
+            last_name=surname,
+            password=None,
+        )
+        return ProfessionalProfile.objects.create(user=user, **validated_data)
 
 
 class ProfessionalProfileSerializer(serializers.ModelSerializer):
