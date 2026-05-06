@@ -52,7 +52,7 @@ django-health-check==3.18.1
 django-inlinecss==0.3.0
 
 # Auto prefetching
-django-auto-prefetching==0.2.1
-
+# django-auto-prefetching==0.2.1
+django-auto-prefetching==0.2.12
 # Utilities
 python-decouple==3.8
