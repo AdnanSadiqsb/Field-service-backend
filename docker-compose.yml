@@ -1,16 +1,5 @@
 version: "3"
 services:
-  db:
-    image: postgres:16.0-alpine
-    ports:
-      - 5432:5432
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - db-data:/data/postgres
-
   web:
     build:
       context: .
@@ -23,9 +12,6 @@ services:
     command: 'sh -c "./manage.py migrate && ./manage.py runserver 0.0.0.0:8000"'
     volumes:
       - ./:/app
-    depends_on:
-      - db
-
   queue:
     build:
       context: .
@@ -60,6 +46,3 @@ services:
     ports:
       - 1025:1025
       - 8025:8025
-
-volumes:
-  db-data:
