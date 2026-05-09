@@ -17,7 +17,7 @@ class TradeCategory(BaseModel):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(blank=True)
-    icon = models.ImageField(upload_to='trade_icons/', blank=True, null=True)
+    icon = models.CharField(max_length=100, blank=True, default='')
     is_active = models.BooleanField(default=True)
     sort_order = models.PositiveIntegerField(default=0)
     requires_coverage_area = models.BooleanField(default=True)
