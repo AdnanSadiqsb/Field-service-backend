@@ -6,6 +6,7 @@ from src.notifications.channels.email import EmailChannel
 logger = logging.getLogger(__name__)
 
 ACTIVITY_USER_RESETS_PASS = 'started password reset process'
+ACTIVITY_PROFESSIONAL_SIGNUP = 'professional signup'
 
 NOTIFICATIONS = {
     ACTIVITY_USER_RESETS_PASS: {
@@ -13,7 +14,13 @@ NOTIFICATIONS = {
             'email_subject': 'Password Reset',
             'email_html_template': 'emails/user_reset_password.html',
         }
-    }
+    },
+    ACTIVITY_PROFESSIONAL_SIGNUP: {
+        'email': {
+            'email_subject': 'Welcome to the platform — you\'re on your way!',
+            'email_html_template': 'emails/professional_onboarding.html',
+        }
+    },
 }
 
 

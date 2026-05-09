@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from .models import TradeCategory, TradeSubCategory, ProfessionalProfile, ProfessionalCoverageArea
+from src.notifications.services import notify, ACTIVITY_PROFESSIONAL_SIGNUP
 
 User = get_user_model()
 
@@ -50,12 +51,25 @@ class ProfessionalProfileCreateSerializer(serializers.ModelSerializer):
             last_name=surname,
             password=None,
         )
-        return ProfessionalProfile.objects.create(user=user, **validated_data)
+        profile = ProfessionalProfile.objects.create(user=user, **validated_data)
+        print(f'Created user {user.username} with email {email}')  # Debug print
+        notify(
+            ACTIVITY_PROFESSIONAL_SIGNUP,
+            context={
+                'first_name': first_name,
+                'business_name': profile.business_name,
+                'trade': profile.trade_category.name,
+            },
+            email_to=[email],
+        )
+        return profile
 
 
 class ProfessionalProfileSerializer(serializers.ModelSerializer):
     trade_category = TradeCategorySerializer(read_only=True)
     sub_categories = TradeSubCategorySerializer(many=True, read_only=True)
+    user = serializers.UUIDField(read_only=True)
+    id = serializers.UUIDField(read_only=True)
 
     class Meta:
         model = ProfessionalProfile

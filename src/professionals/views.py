@@ -45,7 +45,7 @@ class ProfessionalProfileViewSet(viewsets.ModelViewSet):
         profile = serializer.save()
         return Response(
             {
-                'profile': ProfessionalProfileSerializer(profile).data,
+                'profile': ProfessionalProfileSerializer(profile, context={'request': request}).data,
                 'tokens': profile.user.get_tokens(),
             },
             status=status.HTTP_201_CREATED,
@@ -67,25 +67,25 @@ class ProfessionalProfileViewSet(viewsets.ModelViewSet):
         serializer.save()
         return Response(serializer.data)
 
-    @action(detail=False, methods=['post'], url_path='me/submit')
-    def submit(self, request):
-        profile = get_object_or_404(ProfessionalProfile, user=request.user)
-        if profile.status != ProfessionalProfile.Status.DRAFT:
-            return Response({'error': 'Profile must be in draft status to submit'}, status=status.HTTP_400_BAD_REQUEST)
+    # @action(detail=False, methods=['post'], url_path='me/submit')
+    # def submit(self, request):
+    #     profile = get_object_or_404(ProfessionalProfile, user=request.user)
+    #     if profile.status != ProfessionalProfile.Status.DRAFT:
+    #         return Response({'error': 'Profile must be in draft status to submit'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Validation
-        required_fields = ['business_email', 'business_phone', 'postcode', 'address_line_1', 'town_city']
-        missing = [field for field in required_fields if not getattr(profile, field)]
-        if missing:
-            return Response({'error': f'Missing required fields: {", ".join(missing)}'}, status=status.HTTP_400_BAD_REQUEST)
+    #     # Validation
+    #     required_fields = ['business_email', 'business_phone', 'postcode', 'address_line_1', 'town_city']
+    #     missing = [field for field in required_fields if not getattr(profile, field)]
+    #     if missing:
+    #         return Response({'error': f'Missing required fields: {", ".join(missing)}'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if profile.trade_category.requires_coverage_area and not profile.coverage_areas.exists():
-            return Response({'error': 'Coverage area is required for this trade'}, status=status.HTTP_400_BAD_REQUEST)
+    #     if profile.trade_category.requires_coverage_area and not profile.coverage_areas.exists():
+    #         return Response({'error': 'Coverage area is required for this trade'}, status=status.HTTP_400_BAD_REQUEST)
 
-        profile.status = ProfessionalProfile.Status.PENDING_REVIEW
-        profile.save()
-        serializer = self.get_serializer(profile)
-        return Response(serializer.data)
+    #     profile.status = ProfessionalProfile.Status.PENDING_REVIEW
+    #     profile.save()
+    #     serializer = self.get_serializer(profile)
+    #     return Response(serializer.data)
 
 
 class ProfessionalCoverageAreaViewSet(viewsets.ModelViewSet):
@@ -97,27 +97,27 @@ class ProfessionalCoverageAreaViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return ProfessionalCoverageArea.objects.filter(professional__user=self.request.user)
 
-    def perform_create(self, serializer):
-        profile = get_object_or_404(ProfessionalProfile, user=self.request.user)
-        serializer.save(professional=profile)
+    # def perform_create(self, serializer):
+    #     profile = get_object_or_404(ProfessionalProfile, user=self.request.user)
+    #     serializer.save(professional=profile)
 
-    @action(detail=False, methods=['get'], url_path='me/coverage')
-    def me_coverage(self, request):
-        profile = get_object_or_404(ProfessionalProfile, user=request.user)
-        areas = profile.coverage_areas.all()
-        serializer = self.get_serializer(areas, many=True)
-        return Response(serializer.data)
+    # @action(detail=False, methods=['get'], url_path='me/coverage')
+    # def me_coverage(self, request):
+    #     profile = get_object_or_404(ProfessionalProfile, user=request.user)
+    #     areas = profile.coverage_areas.all()
+    #     serializer = self.get_serializer(areas, many=True)
+    #     return Response(serializer.data)
 
-    @action(detail=False, methods=['post'], url_path='me/coverage')
-    def create_me_coverage(self, request):
-        profile = get_object_or_404(ProfessionalProfile, user=request.user)
-        # Replace existing areas
-        profile.coverage_areas.all().delete()
-        data_list = request.data if isinstance(request.data, list) else [request.data]
-        areas = []
-        for data in data_list:
-            serializer = self.get_serializer(data=data)
-            serializer.is_valid(raise_exception=True)
-            areas.append(serializer.save(professional=profile))
-        serializer = self.get_serializer(areas, many=True)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    # @action(detail=False, methods=['post'], url_path='me/coverage')
+    # def create_me_coverage(self, request):
+    #     profile = get_object_or_404(ProfessionalProfile, user=request.user)
+    #     # Replace existing areas
+    #     profile.coverage_areas.all().delete()
+    #     data_list = request.data if isinstance(request.data, list) else [request.data]
+    #     areas = []
+    #     for data in data_list:
+    #         serializer = self.get_serializer(data=data)
+    #         serializer.is_valid(raise_exception=True)
+    #         areas.append(serializer.save(professional=profile))
+    #     serializer = self.get_serializer(areas, many=True)
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED)

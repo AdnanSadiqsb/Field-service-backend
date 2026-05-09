@@ -22,6 +22,6 @@ class EmailChannel:
             return msg.send()
 
         from src.common.tasks import send_email_task
-
-        send_email_task.delay(subject, to, settings.EMAIL_FROM, email_html_message)
+        print(f'Sending email to {to} with subject "{subject}"')  # Debug print
+        send_email_task(subject, to, settings.EMAIL_FROM, email_html_message)
         return
