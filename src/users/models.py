@@ -30,8 +30,15 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
 
 
 class User(AbstractUser):
+    ROLE_CHOICES = [
+        ('admin', 'Admin'),
+        ('professional', 'Professional'),
+        ('client', 'Client'),
+    ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     profile_picture = ThumbnailerImageField('ProfilePicture', upload_to='profile_pictures/', blank=True, null=True)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='admin')
 
     def get_tokens(self):
         refresh = RefreshToken.for_user(self)

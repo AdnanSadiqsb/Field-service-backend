@@ -40,6 +40,7 @@ class ProfessionalProfileCreateSerializer(serializers.ModelSerializer):
         username = email.split('@')[0]
         base_username = username
         counter = 1
+        random_password = User.objects.make_random_password()
         while User.objects.filter(username=username).exists():
             username = f'{base_username}{counter}'
             counter += 1
@@ -49,7 +50,9 @@ class ProfessionalProfileCreateSerializer(serializers.ModelSerializer):
             email=email,
             first_name=first_name,
             last_name=surname,
-            password=None,
+            password=random_password,
+            role = 'professional',
+
         )
         profile = ProfessionalProfile.objects.create(user=user, **validated_data)
         print(f'Created user {user.username} with email {email}')  # Debug print
