@@ -56,15 +56,15 @@ class ProfessionalProfileCreateSerializer(serializers.ModelSerializer):
         )
         profile = ProfessionalProfile.objects.create(user=user, **validated_data)
         print(f'Created user {user.username} with email {email}')  # Debug print
-        notify(
-            ACTIVITY_PROFESSIONAL_SIGNUP,
-            context={
-                'first_name': first_name,
-                'business_name': profile.business_name,
-                'trade': profile.trade_category.name,
-            },
-            email_to=[email],
-        )
+        # notify(
+        #     ACTIVITY_PROFESSIONAL_SIGNUP,
+        #     context={
+        #         'first_name': first_name,
+        #         'business_name': profile.business_name,
+        #         'trade': profile.trade_category.name,
+        #     },
+        #     email_to=[email],
+        # )
         return profile
 
 
