@@ -1,7 +1,22 @@
 import json
 import logging
+import uuid
+from decimal import Decimal
+from datetime import datetime, date
 
 logger = logging.getLogger(__name__)
+
+
+class ExtendedJSONEncoder(json.JSONEncoder):
+    """Handles UUID, Decimal, datetime, date types during JSON serialization."""
+    def default(self, obj):
+        if isinstance(obj, uuid.UUID):
+            return str(obj)
+        if isinstance(obj, Decimal):
+            return float(obj)
+        if isinstance(obj, (datetime, date)):
+            return obj.isoformat()
+        return super().default(obj)
 
 # URL prefixes this middleware applies to — only wrap API responses
 API_PREFIX = '/api/'
@@ -55,7 +70,7 @@ class APIResponseMiddleware:
             wrapped = _wrap_success(body)
 
         # Re-encode and return
-        response.content = json.dumps(wrapped)
+        response.content = json.dumps(wrapped, cls=ExtendedJSONEncoder)
         response['Content-Length'] = len(response.content)
         return response
 

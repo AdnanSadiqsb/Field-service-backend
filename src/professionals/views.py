@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
 from .models import TradeCategory, ProfessionalProfile, ProfessionalCoverageArea
 from .serializers import (
+    ProfessionalProfileListSerializer,
     TradeCategorySerializer,
     ProfessionalProfileSerializer,
     ProfessionalProfileCreateSerializer,
@@ -31,12 +32,14 @@ class ProfessionalProfileViewSet(viewsets.ModelViewSet):
             return [AllowAny()]
         return [IsAuthenticated()]
 
-    def get_queryset(self):
-        return ProfessionalProfile.objects.filter(user=self.request.user)
+    # def get_queryset(self):
+    #     return ProfessionalProfile.objects.filter(user=self.request.user)
 
     def get_serializer_class(self):
         if self.action == 'create':
             return ProfessionalProfileCreateSerializer
+        if self.action in ['list', 'retrieve']:
+            return ProfessionalProfileListSerializer
         return ProfessionalProfileSerializer
 
     def create(self, request, *args, **kwargs):

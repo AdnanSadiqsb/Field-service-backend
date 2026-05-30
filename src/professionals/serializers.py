@@ -69,17 +69,24 @@ class ProfessionalProfileCreateSerializer(serializers.ModelSerializer):
 
 
 class ProfessionalProfileSerializer(serializers.ModelSerializer):
-    trade_category = TradeCategorySerializer(read_only=True)
-    sub_categories = TradeSubCategorySerializer(many=True, read_only=True)
-    user = serializers.UUIDField(read_only=True)
-    id = serializers.UUIDField(read_only=True)
+
 
     class Meta:
         model = ProfessionalProfile
-        fields = ['id', 'user', 'trade_category', 'sub_categories', 'business_name', 'business_type', 'number_of_employees', 'first_name', 'surname', 'business_email', 'business_phone', 'mobile_phone', 'postcode', 'address_line_1', 'address_line_2', 'town_city', 'county', 'status', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'user', 'status', 'created_at', 'updated_at']
+        fields = ['id', 'trade_category', 'business_name', 'business_type', 'number_of_employees', 'first_name', 'surname', 'business_email', 'business_phone', 'mobile_phone', 'postcode', 'address_line_1', 'address_line_2', 'town_city', 'county', 'status', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'status', 'created_at', 'updated_at']
 
 
+class ProfessionalProfileListSerializer(serializers.ModelSerializer):
+    trade_category_info = TradeCategorySerializer(read_only=True, source='trade_category')
+
+    class Meta:
+        model = ProfessionalProfile
+        fields = '__all__'
+    # trade_category = TradeCategorySerializer(read_only=True)
+    # sub_categories = TradeSubCategorySerializer(many=True, read_only=True)
+    # user = serializers.UUIDField(read_only=True)
+    # id = serializers.UUIDField(read_only=True)
 class ProfessionalCoverageAreaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfessionalCoverageArea
