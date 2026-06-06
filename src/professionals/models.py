@@ -41,7 +41,7 @@ class TradeSubCategory(BaseModel):
 
     class Meta:
         ordering = ['sort_order', 'name']
-        unique_together = ['trade_category', 'slug']
+        unique_together = ['trade_category', 'name']
         verbose_name = _('Trade Subcategory')
         verbose_name_plural = _('Trade Subcategories')
 

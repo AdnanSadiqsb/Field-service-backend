@@ -1,9 +1,10 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, mixins
+
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
-from .models import TradeCategory, ProfessionalProfile, ProfessionalCoverageArea
+from .models import TradeCategory, ProfessionalProfile, ProfessionalCoverageArea, TradeSubCategory
 from .serializers import (
     ProfessionalProfileListSerializer,
     TradeCategorySerializer,
@@ -13,15 +14,24 @@ from .serializers import (
 )
 
 
-class TradeCategoryViewSet(viewsets.ReadOnlyModelViewSet):
+class TradeCategoryViewSet(viewsets.ReadOnlyModelViewSet, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
     queryset = TradeCategory.objects.filter(is_active=True).prefetch_related('subcategories')
     serializer_class = TradeCategorySerializer
     permission_classes = [AllowAny]
-    lookup_field = 'slug'
+    # lookup_field = 'slug'
     swagger_tags = ['Trades']
 
 
-class ProfessionalProfileViewSet(viewsets.ModelViewSet):
+    # @action(detail=False, methods=['get'], url_path='subcategories')
+    # def subCategories(self, request):
+    #     TradeSubCategory.objects.filter(is_active=True).select_related('trade_category')
+    #     serializer = self.get_serializer(profile)
+    #     return Response(serializer.data)
+
+
+
+
+class ProfessionalProfileViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin):
     queryset = ProfessionalProfile.objects.all()
     serializer_class = ProfessionalProfileSerializer
     permission_classes = [IsAuthenticated]

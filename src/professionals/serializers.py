@@ -21,6 +21,14 @@ class TradeCategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug', 'description', 'icon', 'is_active', 'sort_order', 'requires_coverage_area', 'subcategories']
 
 
+
+class TradeCategoryShortSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TradeCategory
+        fields = ['id', 'name', 'slug', 'description', 'icon']
+
+
 class ProfessionalProfileCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProfessionalProfile
@@ -78,7 +86,7 @@ class ProfessionalProfileSerializer(serializers.ModelSerializer):
 
 
 class ProfessionalProfileListSerializer(serializers.ModelSerializer):
-    trade_category_info = TradeCategorySerializer(read_only=True, source='trade_category')
+    trade_category_info = TradeCategoryShortSerializer(read_only=True, source='trade_category')
 
     class Meta:
         model = ProfessionalProfile
