@@ -14,19 +14,11 @@ from .serializers import (
 )
 
 
-class TradeCategoryViewSet(viewsets.ReadOnlyModelViewSet, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
+class TradeCategoryViewSet(viewsets.ModelViewSet):
     queryset = TradeCategory.objects.filter(is_active=True).prefetch_related('subcategories')
     serializer_class = TradeCategorySerializer
     permission_classes = [AllowAny]
-    # lookup_field = 'slug'
     swagger_tags = ['Trades']
-
-
-    # @action(detail=False, methods=['get'], url_path='subcategories')
-    # def subCategories(self, request):
-    #     TradeSubCategory.objects.filter(is_active=True).select_related('trade_category')
-    #     serializer = self.get_serializer(profile)
-    #     return Response(serializer.data)
 
 
 

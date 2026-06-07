@@ -8,17 +8,60 @@ User = get_user_model()
 
 
 class TradeSubCategorySerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(required=False, allow_null=True)
+
     class Meta:
         model = TradeSubCategory
-        fields = ['id', 'name', 'slug', 'description', 'is_active', 'sort_order']
+        fields = ['id', 'name', 'slug', 'description', 'sort_order']
+        extra_kwargs = {'slug': {'required': False}}
 
 
 class TradeCategorySerializer(serializers.ModelSerializer):
-    subcategories = TradeSubCategorySerializer(many=True, read_only=True)
+    subcategories = TradeSubCategorySerializer(many=True, required=False)
 
     class Meta:
         model = TradeCategory
         fields = ['id', 'name', 'slug', 'description', 'icon', 'is_active', 'sort_order', 'requires_coverage_area', 'subcategories']
+        extra_kwargs = {'slug': {'required': False}}
+
+    @transaction.atomic
+    def create(self, validated_data):
+        subcategories = validated_data.pop('subcategories', [])
+        print(f"Creating TradeCategory with data: {validated_data} and subcategories: {subcategories}")  # Debug print
+        if 'slug' not in validated_data:
+            from django.utils.text import slugify
+            validated_data['slug'] = slugify(validated_data['name'])
+
+        print("Creating TradeCategory with validated data: ", validated_data)  # Debug print
+        category = TradeCategory.objects.create(**validated_data)
+        print(f"Created TradeCategory with ID: {category.id}")  # Debug print
+        self._upsert_subcategories(category, subcategories)
+        return category
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        subcategories = validated_data.pop('subcategories', None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        if subcategories is not None:
+            self._upsert_subcategories(instance, subcategories)
+        return instance
+
+    def _upsert_subcategories(self, category, subcategories):
+        from django.utils.text import slugify
+
+        print(f"Upserting subcategories for category {category.name} with data: {subcategories}")  # Debug print
+        for item in subcategories:
+            sub_id = item.pop('id', None)
+            if 'slug' not in item or not item['slug']:
+                item['slug'] = slugify(item['name'])
+
+            print(f"Upserting subcategory with data: {item}")  # Debug print
+            if sub_id:
+                TradeSubCategory.objects.filter(id=sub_id, trade_category=category).update(**item)
+            else:
+                TradeSubCategory.objects.get_or_create(slug=item['slug'], trade_category=category, defaults=item)
 
 
 
