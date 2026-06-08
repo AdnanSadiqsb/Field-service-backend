@@ -1,4 +1,5 @@
-from rest_framework import viewsets, status, mixins
+from rest_framework import viewsets, status, mixins, filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -10,7 +11,8 @@ from .serializers import (
     TradeCategorySerializer,
     ProfessionalProfileSerializer,
     ProfessionalProfileCreateSerializer,
-    ProfessionalCoverageAreaSerializer
+    ProfessionalCoverageAreaSerializer,
+    ProfessionalProfileDetailSerializer,
 )
 
 
@@ -24,9 +26,59 @@ class TradeCategoryViewSet(viewsets.ModelViewSet):
 
 
 class ProfessionalProfileViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin):
-    queryset = ProfessionalProfile.objects.all()
+    queryset = ProfessionalProfile.objects.select_related('trade_category', 'user').prefetch_related(
+        'trade_category__subcategories',
+        'sub_categories',
+        'coverage_areas',
+    )
     serializer_class = ProfessionalProfileSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = [
+        'business_name',
+        'first_name',
+        'surname',
+        'business_email',
+        'business_phone',
+        'mobile_phone',
+        'postcode',
+        'town_city',
+        'county',
+        'status',
+        'user__username',
+        'trade_category__name',
+        'trade_category__slug',
+        'sub_categories__name',
+        'sub_categories__slug',
+        'coverage_areas__postcode_district',
+    ]
+    filterset_fields = {
+        'status': ['exact', 'in'],
+        'trade_category': ['exact'],
+        'sub_categories': ['exact'],
+        'business_type': ['exact', 'in'],
+        'number_of_employees': ['exact', 'in'],
+        'town_city': ['exact', 'icontains'],
+        'county': ['exact', 'icontains'],
+        'coverage_areas__source': ['exact'],
+        'coverage_areas__postcode_district': ['exact', 'icontains'],
+        'created_at': ['exact', 'gte', 'lte'],
+        'updated_at': ['exact', 'gte', 'lte'],
+    }
+    ordering_fields = [
+        'business_name',
+        'first_name',
+        'surname',
+        'business_email',
+        'status',
+        'business_type',
+        'number_of_employees',
+        'town_city',
+        'county',
+        'created_at',
+        'updated_at',
+    ]
+    ordering = ['-created_at']
     swagger_tags = ['Professional']
 
     def get_permissions(self):
@@ -34,12 +86,23 @@ class ProfessionalProfileViewSet(viewsets.GenericViewSet, mixins.CreateModelMixi
             return [AllowAny()]
         return [IsAuthenticated()]
 
-    # def get_queryset(self):
-    #     return ProfessionalProfile.objects.filter(user=self.request.user)
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.request.user.is_staff:
+            return queryset
+        return queryset.filter(user=self.request.user)
+
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        if self.action == 'list':
+            queryset = queryset.distinct()
+        return queryset
 
     def get_serializer_class(self):
         if self.action == 'create':
             return ProfessionalProfileCreateSerializer
+        if self.action == 'professional_details':
+            return ProfessionalProfileDetailSerializer
         if self.action in ['list', 'retrieve']:
             return ProfessionalProfileListSerializer
         return ProfessionalProfileSerializer
@@ -70,6 +133,12 @@ class ProfessionalProfileViewSet(viewsets.GenericViewSet, mixins.CreateModelMixi
         serializer = self.get_serializer(profile, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'], url_path='details')
+    def professional_details(self, request, pk=None):
+        profile = self.get_object()
+        serializer = self.get_serializer(profile)
         return Response(serializer.data)
 
     # @action(detail=False, methods=['post'], url_path='me/submit')

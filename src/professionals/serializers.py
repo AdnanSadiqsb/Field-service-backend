@@ -128,6 +128,47 @@ class ProfessionalProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'status', 'created_at', 'updated_at']
 
 
+class ProfessionalCoverageAreaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProfessionalCoverageArea
+        fields = ['id', 'base_postcode', 'radius_miles', 'postcode_district', 'source', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+
+class ProfessionalProfileDetailSerializer(serializers.ModelSerializer):
+    trade_category_info = TradeCategorySerializer(read_only=True, source='trade_category')
+    # sub_categories_info = TradeSubCategorySerializer(read_only=True, many=True, source='sub_categories')
+    coverage_areas_info = ProfessionalCoverageAreaSerializer(read_only=True, many=True, source='coverage_areas')
+
+    class Meta:
+        model = ProfessionalProfile
+        fields = [
+            'id',
+            'trade_category',
+            'trade_category_info',
+            'sub_categories',
+           
+            'coverage_areas_info',
+            'business_name',
+            'business_type',
+            'number_of_employees',
+            'first_name',
+            'surname',
+            'business_email',
+            'business_phone',
+            'mobile_phone',
+            'postcode',
+            'address_line_1',
+            'address_line_2',
+            'town_city',
+            'county',
+            'status',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = fields
+
+
 class ProfessionalProfileListSerializer(serializers.ModelSerializer):
     trade_category_info = TradeCategoryShortSerializer(read_only=True, source='trade_category')
 
@@ -138,8 +179,3 @@ class ProfessionalProfileListSerializer(serializers.ModelSerializer):
     # sub_categories = TradeSubCategorySerializer(many=True, read_only=True)
     # user = serializers.UUIDField(read_only=True)
     # id = serializers.UUIDField(read_only=True)
-class ProfessionalCoverageAreaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProfessionalCoverageArea
-        fields = ['id', 'base_postcode', 'radius_miles', 'postcode_district', 'source', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'created_at', 'updated_at']
